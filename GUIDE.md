@@ -41,3 +41,6 @@ Mettre `PAY_ENABLED:true` dans `config.js` et brancher CinetPay ou PayDunya sur 
 
 ## Mise à jour
 Après toute modification de fichier : glisser le dossier à nouveau dans Netlify (Deploys > drag and drop).
+
+## Langues FR / EN
+Le bouton FR/EN est en haut du site. Les textes du site sont traduits automatiquement. Pour les articles du catalogue, remplissez « Nom en anglais » et « Description en anglais » dans l'admin. Si votre base Supabase existe déjà, exécutez `migration-langue.sql` une fois dans SQL Editor.

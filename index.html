@@ -46,7 +46,7 @@ footer{background:var(--k);color:#ddd;padding:40px 18px 100px;text-align:center}
 #ib{position:fixed;left:12px;right:12px;bottom:calc(90px + env(safe-area-inset-bottom,0px));z-index:35;background:#111;color:#fff;border:1px solid var(--g);border-radius:18px;padding:14px;display:none;box-shadow:0 10px 30px #000a;max-width:520px;margin:auto}
 .btn.d{background:none;border:1.5px solid var(--g);color:#7a560c;box-shadow:none}.sr{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 </style></head><body>
-<nav><img src="logo.png" alt="FME"><div><a class="h" href="#services">Services</a><a class="h" href="#catalogue">Catalogue</a><a class="h" href="#galerie">Réalisations</a><a href="#devis">Devis</a><a id="inst" href="#">⬇ Installer</a></div></nav>
+<nav><img src="logo.png" alt="FME"><div><a class="h" href="#services">Services</a><a class="h" href="#catalogue">Catalogue</a><a class="h" href="#galerie">Réalisations</a><a href="#devis">Devis</a><a id="inst" href="#">⬇ Installer</a><a id="lg" href="#" style="border:1px solid var(--g2);border-radius:14px;padding:2px 10px;font-weight:600">EN</a></div></nav>
 <header class="hero"><span class="sp" style="top:18%;left:12%">✦</span><span class="sp" style="top:30%;right:14%;animation-delay:1s">✦</span><span class="sp" style="bottom:22%;left:20%;animation-delay:2s">✦</span>
 <img src="logo.png" alt="First Miracle Event"><h1>La touche miraculeuse</h1>
 <p>Décoration, surprises, location de matériel, traiteur et box cadeaux à Abidjan. Composez votre événement et obtenez votre devis en direct.</p>
@@ -74,41 +74,51 @@ footer{background:var(--k);color:#ddd;padding:40px 18px 100px;text-align:center}
 <script>
 const $=s=>document.querySelector(s),F=FME,sb=F.SUPABASE_URL?supabase.createClient(F.SUPABASE_URL,F.SUPABASE_KEY):null;
 const K={pack:['Packs mariage','💍'],decoration:['Décoration','🌸'],surprise:['Surprise & demande','🤫'],location:['Location matériel','🪑'],traiteur:['Traiteur & mignardises','🍽️'],tenue:['Tenues traditionnelles','👘'],box:['Box & bouquets','🎁'],sortie:['Chic pic & sorties','🧺']};
-let items=[],cart={},tab='pack';const fmt=n=>Number(n||0).toLocaleString('fr-FR')+' FCFA';
+let lang=(()=>{try{if(localStorage.lg)return localStorage.lg}catch(e){}return /^en/i.test(navigator.language)?'en':'fr'})(),ld=0;
+const EN={"Réalisations":"Our work","Devis":"Quote","⬇ Installer":"⬇ Install","La touche miraculeuse":"The miraculous touch","Décoration, surprises, location de matériel, traiteur et box cadeaux à Abidjan. Composez votre événement et obtenez votre devis en direct.":"Decoration, surprises, equipment rental, catering and gift boxes in Abidjan. Build your event and get your quote instantly.","Composer mon devis ✨":"Build my quote ✨","Écrire sur WhatsApp":"Message us on WhatsApp","Que souhaitez-vous réaliser ?":"What would you like to create?","Choisissez un service, nous nous occupons du reste.":"Pick a service, we take care of the rest.","Notre catalogue":"Our catalogue","Ajoutez ce que vous aimez : le devis se calcule tout seul.":"Add what you love: the quote calculates itself.","Votre devis instantané":"Your instant quote","Envoyez-nous aussi votre thème ou photo d'inspiration.":"Also send us your theme or an inspiration photo.","Nom":"Name","Téléphone / WhatsApp":"Phone / WhatsApp","Type d'événement":"Event type","Nombre d'invités":"Number of guests","Photo d'inspiration":"Inspiration photo","Votre thème, vos envies":"Your theme, your wishes","Mariage":"Wedding","Anniversaire":"Birthday","Baptême":"Christening","Demande en mariage":"Marriage proposal","Autre":"Other","🤫 Mode surprise : confidentialité totale, on ne mentionne rien au partenaire":"🤫 Surprise mode: total discretion, we never mention anything to your partner","💳 Acompte par Mobile Money (bientôt disponible)":"💳 Deposit via Mobile Money (coming soon)","Envoyer ma demande sur WhatsApp":"Send my request on WhatsApp","Nos réalisations":"Our work","Chaque détail, une touche miraculeuse.":"Every detail, a miraculous touch.","Invitez vos proches":"Invite your loved ones","Partagez l'application : en ouvrant votre lien, ils pourront l'installer sur leur téléphone.":"Share the app: by opening your link, they can install it on their phone.","📤 Partager l'application":"📤 Share the app","🔗 Copier le lien":"🔗 Copy link","📍 2 Plateaux, Abidjan, Côte d'Ivoire":"📍 2 Plateaux, Abidjan, Ivory Coast","Inviter":"Invite","Installer First Miracle Event":"Install First Miracle Event","⬇ Installer l'application":"⬇ Install the app","Accès rapide depuis votre écran d'accueil.":"Quick access from your home screen.","Packs mariage":"Wedding packs","Décoration":"Decoration","Surprise & demande":"Surprise & proposal","Location matériel":"Equipment rental","Traiteur & mignardises":"Catering & petits fours","Tenues traditionnelles":"Traditional outfits","Box & bouquets":"Boxes & bouquets","Chic pic & sorties":"Chic picnics & outings","Ajoutez des articles depuis le catalogue.":"Add items from the catalogue.","Bientôt disponible.":"Coming soon.","Stock :":"Stock:","Demande enregistrée ✔":"Request saved ✔","Lien copié ✔":"Link copied ✔","Application installée ✔":"App installed ✔","Copiez ce lien":"Copy this link","pack":"pack","prestation":"service","par chaise":"per chair","par table":"per table","par invité":"per guest","pièce":"piece","plateau":"tray","tenue":"outfit","bouquet":"bouquet","sortie":"outing","unité":"unit"};
+const t=x=>lang==='en'&&EN[x]||x,nm=i=>lang==='en'&&i.name_en||i.name,ds=i=>(lang==='en'&&i.description_en)||i.description||'';
+const ST=()=>lang==='en'?"Discover First Miracle Event: decoration and event rental in Abidjan. Install the app:":"Découvrez First Miracle Event : décoration et location événementielle à Abidjan. Installez l'application :";
+const fmt=n=>Number(n||0).toLocaleString(lang==='en'?'en-US':'fr-FR')+' FCFA';
+function tr(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:n=>/^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName)?2:1});let n;while(n=w.nextNode()){const o=n.__o??(n.__o=n.nodeValue),k=o.trim();if(!k)continue;n.nodeValue=o.replace(k,lang==='en'&&EN[k]||k)}}
+function setIbt(){if(ios&&!standalone)$('#ibt').innerHTML=lang==='en'?'Tap <b>Share</b> ⎋ at the bottom of Safari, then <b>“Add to Home Screen”</b>':'Touchez <b>Partager</b> ⎋ en bas de Safari, puis <b>« Sur l’écran d’accueil »</b>'}
+function setLang(l){lang=l;try{localStorage.lg=l}catch(e){}document.documentElement.lang=l;$('#lg').textContent=l==='en'?'FR':'EN';document.title=l==='en'?'First Miracle Event · The miraculous touch · Abidjan':'First Miracle Event · La touche miraculeuse · Abidjan';
+$('#wa1').href=$('#wa2').href=wa(l==='en'?"Hello First Miracle Event, I'd like some information.":"Bonjour First Miracle Event, j'aimerais avoir des informations.");$('#shw').href='https://wa.me/?text='+encodeURIComponent(ST()+' '+SU);rs();rt();tr();setIbt()}
+let items=[],cart={},tab='pack';
 const wa=t=>`https://wa.me/${F.WHATSAPP}?text=${encodeURIComponent(t)}`,toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2600)};
-$('#wa1').href=$('#wa2').href=wa("Bonjour First Miracle Event, j'aimerais avoir des informations.");
+
 $('#ph').innerHTML=F.PHONES.map(p=>`<a href="tel:${p.replace(/\s/g,'')}">${p}</a>`).join(' ');$('#ml').href='mailto:'+F.MAIL;$('#ml').textContent=F.MAIL;$('#fb').href=F.FB;$('#tt').href=F.TT;
 if(F.PAY_ENABLED)$('#pay').style.display='block';
-$('#svcs').innerHTML=Object.entries(K).map(([k,[n,e]])=>`<div class="svc" onclick="tab='${k}';rt();location.hash='catalogue'"><b>${e}</b><span>${n}</span></div>`).join('');
+const rs=()=>$('#svcs').innerHTML=Object.entries(K).map(([k,[n,e]])=>`<div class="svc" onclick="tab='${k}';rt();location.hash='catalogue'"><b>${e}</b><span>${t(n)}</span></div>`).join('');
 const qtyOf=i=>/invité/.test(i.unit||'')?+($('#gu').value||0):cart[i.id]||0;
-function rt(){$('#tabs').innerHTML=Object.entries(K).map(([k,[n]])=>`<button class="${k==tab?'on':''}" onclick="tab='${k}';rt()">${n}</button>`).join('');
-$('#cat').innerHTML=items.filter(i=>i.kind==tab).map(i=>`<div class="card"><div class="ph" style="${i.image_url?`background-image:url(${i.image_url})`:''}">${i.image_url?'':K[i.kind][1]}</div><div class="b"><h3>${i.name}</h3><small>${i.description||''}</small><div class="pr">${fmt(i.price)} <small>/ ${i.unit||''}</small></div>${i.stock?`<small>Stock : ${i.stock}</small>`:''}<div class="qty"><button onclick="ch('${i.id}',-1)">−</button><b>${cart[i.id]||0}</b><button onclick="ch('${i.id}',1)">+</button></div></div></div>`).join('')||'<p class="sub">Bientôt disponible.</p>';sum()}
+function rt(){$('#tabs').innerHTML=Object.entries(K).map(([k,[n]])=>`<button class="${k==tab?'on':''}" onclick="tab='${k}';rt()">${t(n)}</button>`).join('');
+$('#cat').innerHTML=items.filter(i=>i.kind==tab).map(i=>`<div class="card"><div class="ph" style="${i.image_url?`background-image:url(${i.image_url})`:''}">${i.image_url?'':K[i.kind][1]}</div><div class="b"><h3>${nm(i)}</h3><small>${ds(i)}</small><div class="pr">${fmt(i.price)} <small>/ ${t(i.unit||'')}</small></div>${i.stock?`<small>${t('Stock :')} ${i.stock}</small>`:''}<div class="qty"><button onclick="ch('${i.id}',-1)">−</button><b>${cart[i.id]||0}</b><button onclick="ch('${i.id}',1)">+</button></div></div></div>`).join('')||(ld?`<p class="sub">${t('Bientôt disponible.')}</p>`:'');sum()}
 function ch(id,d){cart[id]=Math.max(0,(cart[id]||0)+d);rt()}
-function lines(){return items.filter(i=>cart[i.id]).map(i=>({n:i.name,q:qtyOf(i),p:+i.price}))}
-let shown=0;function sum(){const L=lines(),t=L.reduce((a,l)=>a+l.q*l.p,0);$('#lines').innerHTML=L.map(l=>`• ${l.n} × ${l.q} = ${fmt(l.q*l.p)}`).join('<br>')||'Ajoutez des articles depuis le catalogue.';
+function lines(){return items.filter(i=>cart[i.id]).map(i=>({n:i.name,d:nm(i),q:qtyOf(i),p:+i.price}))}
+let shown=0;function sum(){const L=lines(),t=L.reduce((a,l)=>a+l.q*l.p,0);$('#lines').innerHTML=L.map(l=>`• ${l.d} × ${l.q} = ${fmt(l.q*l.p)}`).join('<br>')||t('Ajoutez des articles depuis le catalogue.');
 const s=shown,st=performance.now();(function a(n){const p=Math.min(1,(n-st)/500);$('#tot').textContent=fmt(Math.round(s+(t-s)*p));if(p<1)requestAnimationFrame(a);else shown=t})(st)}
 $('#gu').oninput=sum;
 $('#fm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),L=lines(),tot=L.reduce((a,l)=>a+l.q*l.p,0);let url='';const file=$('#photo').files[0];
 if(sb&&file){const p='inspiration/'+Date.now()+'-'+file.name.replace(/[^\w.]/g,'_');const r=await sb.storage.from('media').upload(p,file);if(!r.error)url=sb.storage.from('media').getPublicUrl(p).data.publicUrl}
 const rec={name:f.get('name'),phone:f.get('phone'),event_type:f.get('event_type'),event_date:f.get('event_date')||null,guests:+f.get('guests')||null,message:f.get('message'),items:L,total:tot,surprise:!!f.get('surprise'),inspiration_url:url,source:new URLSearchParams(location.search).get('src')||'direct'};
 try{if(sb)await sb.from('requests').insert(rec);if(F.GSHEET_URL)fetch(F.GSHEET_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(rec)})}catch(x){}
-const m=`Bonjour First Miracle Event ✨\nNom : ${rec.name}\nTél : ${rec.phone}\nÉvénement : ${rec.event_type}${rec.event_date?' le '+rec.event_date:''}\nInvités : ${rec.guests||'-'}\n${L.map(l=>`• ${l.n} × ${l.q}`).join('\n')}\nTotal estimé : ${fmt(tot)}\n${rec.surprise?'🤫 Mode surprise\n':''}${rec.message||''}${url?'\nInspiration : '+url:''}`;
-toast('Demande enregistrée ✔');location.href=wa(m)};
+const E=lang==='en',M=E?['Hello First Miracle Event ✨','Name','Phone','Event',' on ','Guests','Estimated total','🤫 Surprise mode','Inspiration']:['Bonjour First Miracle Event ✨','Nom','Tél','Événement',' le ','Invités','Total estimé','🤫 Mode surprise','Inspiration'];
+const m=`${M[0]}\n${M[1]} : ${rec.name}\n${M[2]} : ${rec.phone}\n${M[3]} : ${t(rec.event_type)}${rec.event_date?M[4]+rec.event_date:''}\n${M[5]} : ${rec.guests||'-'}\n${L.map(l=>`• ${l.d} × ${l.q}`).join('\n')}\n${M[6]} : ${fmt(tot)}\n${rec.surprise?M[7]+'\n':''}${rec.message||''}${url?'\n'+M[8]+' : '+url:''}`;
+toast(t('Demande enregistrée ✔'));location.href=wa(m)};
 (async()=>{if(sb){const a=await sb.from('items').select('*').eq('active',true).order('sort').order('name');items=a.data||[];const g=await sb.from('gallery').select('*').order('created_at',{ascending:false}).limit(24);
 $('#gal').innerHTML=(g.data||[]).map(x=>`<img loading="lazy" src="${x.image_url}" alt="${x.title||''}">`).join('')}else items=F.DEMO.map((x,i)=>({...x,id:'d'+i}));
-if(!$('#gal').innerHTML)$('#galerie').style.display='none';rt()})();
+if(!$('#gal').innerHTML)$('#galerie').style.display='none';ld=1;setLang(lang)})();
 const ua=navigator.userAgent,ios=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),
 standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone,ib=$('#ib');let dp;
 const seen=()=>{try{return Date.now()-(+localStorage.ibx||0)<6048e5}catch(e){return false}},showIB=f=>{if(!standalone&&(f||!seen()))ib.style.display='block'};
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('#inst').style.display='inline';setTimeout(showIB,1200)});
-addEventListener('appinstalled',()=>{ib.style.display='none';$('#inst').style.display='none';toast('Application installée ✔')});
-if(ios&&!standalone){$('#ibt').innerHTML='Touchez <b>Partager</b> <span style="font-size:16px">⎋</span> en bas de Safari, puis <b>« Sur l\'écran d\'accueil »</b>';$('#ibb').style.display='none';$('#inst').style.display='inline';setTimeout(showIB,2500)}
+addEventListener('appinstalled',()=>{ib.style.display='none';$('#inst').style.display='none';toast(t('Application installée ✔'))});
+if(ios&&!standalone){$('#ibb').style.display='none';$('#inst').style.display='inline';setTimeout(showIB,2500)}
 async function doInst(){if(dp){dp.prompt();await dp.userChoice;dp=null;ib.style.display='none'}else showIB(true)}
 $('#ibb').onclick=doInst;$('#inst').onclick=e=>{e.preventDefault();doInst()};
 $('#ibx').onclick=()=>{ib.style.display='none';try{localStorage.ibx=Date.now()}catch(e){}};
-const SU=location.href.split(/[?#]/)[0].replace(/index\.html$/,'')+'?src=partage',ST="Découvrez First Miracle Event : décoration et location événementielle à Abidjan. Installez l'application :";
-$('#shw').href='https://wa.me/?text='+encodeURIComponent(ST+' '+SU);
-$('#sh').onclick=async()=>{if(navigator.share){try{await navigator.share({title:'First Miracle Event',text:ST,url:SU})}catch(e){}}else $('#shw').click()};
-$('#shc').onclick=async()=>{try{await navigator.clipboard.writeText(SU);toast('Lien copié ✔')}catch(e){prompt('Copiez ce lien',SU)}};
+const SU=location.href.split(/[?#]/)[0].replace(/index\.html$/,'')+'?src=partage';
+$('#sh').onclick=async()=>{if(navigator.share){try{await navigator.share({title:'First Miracle Event',text:ST(),url:SU})}catch(e){}}else $('#shw').click()};
+$('#shc').onclick=async()=>{try{await navigator.clipboard.writeText(SU);toast(t('Lien copié ✔'))}catch(e){prompt(t('Copiez ce lien'),SU)}};
+document.querySelectorAll('#fm option').forEach(o=>o.value=o.textContent);$('#lg').onclick=e=>{e.preventDefault();setLang(lang==='en'?'fr':'en')};setLang(lang);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>0);
 </script></body></html>
