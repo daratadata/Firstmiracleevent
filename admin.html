@@ -1,0 +1,42 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>FME · Espace gestionnaire</title>
+<style>
+*{box-sizing:border-box;margin:0}body{font:14px/1.5 system-ui,sans-serif;background:#f6f1e6;color:#222}
+header{background:#111;color:#e6c36e;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+nav{display:flex;gap:6px;padding:10px;overflow-x:auto;background:#fff}nav button{padding:8px 14px;border:1px solid #c9993a;background:none;border-radius:20px;cursor:pointer;white-space:nowrap}nav .on{background:#111;color:#e6c36e}
+main{padding:14px;max-width:900px;margin:auto}.box{background:#fff;border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid #e8dcc0}
+input,select,textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font:inherit;margin:4px 0}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:8px}.b{background:#c9993a;color:#111;border:0;padding:10px 16px;border-radius:8px;font-weight:600;cursor:pointer}.b.r{background:#b33;color:#fff}.b.s{background:#eee;color:#222}
+.row{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #eee}.row img{width:48px;height:48px;object-fit:cover;border-radius:8px}.row .i{flex:1}
+#login{max-width:340px;margin:80px auto}.tag{background:#eee;border-radius:10px;padding:1px 8px;font-size:12px}
+</style></head><body>
+<div id="login" class="box"><h3>Espace gestionnaire</h3><input id="em" type="email" placeholder="E-mail"><input id="pw" type="password" placeholder="Mot de passe"><button class="b" onclick="lg()">Connexion</button><p id="er" style="color:#b33"></p></div>
+<div id="app" style="display:none"><header><b>First Miracle Event · Gestion</b><button class="b s" onclick="sb.auth.signOut().then(()=>location.reload())">Quitter</button></header>
+<nav id="nv"></nav><main id="mn"></main></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="config.js"></script>
+<script>
+const F=FME,sb=supabase.createClient(F.SUPABASE_URL,F.SUPABASE_KEY),$=s=>document.querySelector(s),fmt=n=>Number(n||0).toLocaleString('fr-FR')+' FCFA';
+const KINDS=['pack','decoration','surprise','location','traiteur','tenue','box','sortie'];let T='items',ed=null;
+async function lg(){const r=await sb.auth.signInWithPassword({email:$('#em').value,password:$('#pw').value});if(r.error)$('#er').textContent='Identifiants incorrects';else init()}
+async function init(){const s=(await sb.auth.getSession()).data.session;if(!s)return;$('#login').style.display='none';$('#app').style.display='block';go('items')}
+function go(t){T=t;ed=null;$('#nv').innerHTML=[['items','Catalogue'],['gallery','Galerie'],['requests','Demandes'],['qr','QR code']].map(([k,n])=>`<button class="${k==T?'on':''}" onclick="go('${k}')">${n}</button>`).join('');({items:vi,gallery:vg,requests:vr,qr:vq})[t]()}
+async function up(file,dir){const p=dir+'/'+Date.now()+'-'+file.name.replace(/[^\w.]/g,'_');const r=await sb.storage.from('media').upload(p,file);if(r.error){alert(r.error.message);return''}return sb.storage.from('media').getPublicUrl(p).data.publicUrl}
+async function vi(){const {data}=await sb.from('items').select('*').order('kind').order('sort');const e=ed||{kind:'pack',unit:'unité',active:true,sort:0};
+$('#mn').innerHTML=`<div class="box"><h3>${ed?'Modifier':'Ajouter'} un article</h3><div class="g"><select id="k">${KINDS.map(k=>`<option ${k==e.kind?'selected':''}>${k}</option>`).join('')}</select><input id="n" placeholder="Nom" value="${e.name||''}"><input id="p" type="number" placeholder="Prix FCFA" value="${e.price||''}"><input id="u" placeholder="Unité (ex: par chaise, par invité)" value="${e.unit||''}"><input id="s" type="number" placeholder="Stock (facultatif)" value="${e.stock||''}"><input id="o" type="number" placeholder="Ordre" value="${e.sort||0}"></div><textarea id="d" placeholder="Description">${e.description||''}</textarea><input id="im" type="file" accept="image/*"><label><input type="checkbox" id="a" style="width:auto" ${e.active?'checked':''}> Visible sur le site</label><br><button class="b" onclick="si()">Enregistrer</button> ${ed?'<button class="b s" onclick="go(\'items\')">Annuler</button>':'<button class="b s" onclick="demo()">Charger le catalogue d\'exemple</button>'}</div>
+<div class="box">${(data||[]).map(i=>`<div class="row">${i.image_url?`<img src="${i.image_url}">`:''}<div class="i"><b>${i.name}</b> <span class="tag">${i.kind}</span><br>${fmt(i.price)} / ${i.unit||''} ${i.active?'':'· masqué'}</div><button class="b s" onclick='ed=${JSON.stringify(i).replace(/'/g,"&#39;")};vi()'>✎</button><button class="b r" onclick="di('${i.id}')">✕</button></div>`).join('')||'Aucun article.'}</div>`}
+async function si(){let url=ed?.image_url||null;const f=$('#im').files[0];if(f)url=await up(f,'items');const r={kind:$('#k').value,name:$('#n').value,price:+$('#p').value||0,unit:$('#u').value,stock:$('#s').value?+$('#s').value:null,sort:+$('#o').value||0,description:$('#d').value,active:$('#a').checked,image_url:url};
+const q=ed?sb.from('items').update(r).eq('id',ed.id):sb.from('items').insert(r);const x=await q;if(x.error)return alert(x.error.message);go('items')}
+async function di(id){if(confirm('Supprimer ?')){await sb.from('items').delete().eq('id',id);go('items')}}
+async function demo(){const x=await sb.from('items').insert(F.DEMO.map((d,i)=>({...d,sort:i})));if(x.error)alert(x.error.message);go('items')}
+async function vg(){const {data}=await sb.from('gallery').select('*').order('created_at',{ascending:false});
+$('#mn').innerHTML=`<div class="box"><h3>Ajouter des photos de réalisations</h3><input id="gt" placeholder="Titre (ex: Mariage Kouassi)"><input id="gf" type="file" accept="image/*" multiple><button class="b" onclick="sg()">Publier</button></div><div class="box">${(data||[]).map(i=>`<div class="row"><img src="${i.image_url}"><div class="i">${i.title||''}</div><button class="b r" onclick="dg('${i.id}')">✕</button></div>`).join('')}</div>`}
+async function sg(){for(const f of $('#gf').files){const u=await up(f,'gallery');if(u)await sb.from('gallery').insert({title:$('#gt').value,image_url:u})}go('gallery')}
+async function dg(id){if(confirm('Supprimer ?')){await sb.from('gallery').delete().eq('id',id);go('gallery')}}
+async function vr(){const {data}=await sb.from('requests').select('*').order('created_at',{ascending:false});
+$('#mn').innerHTML=(data||[]).map(r=>`<div class="box"><b>${r.name}</b> · ${r.event_type} ${r.event_date||''} · ${r.guests||'-'} invités ${r.surprise?'🤫':''}<br>📞 ${r.phone} · <span class="tag">${r.source}</span> · ${new Date(r.created_at).toLocaleDateString('fr-FR')}<br>${(r.items||[]).map(l=>`• ${l.n} × ${l.q}`).join('<br>')}<br><b>${fmt(r.total)}</b><br>${r.message||''} ${r.inspiration_url?`<br><a href="${r.inspiration_url}" target="_blank">📷 Inspiration</a>`:''}
+<div class="g" style="margin-top:8px"><select onchange="sb.from('requests').update({status:this.value}).eq('id','${r.id}').then(()=>0)">${['nouveau','devis envoyé','confirmé','terminé','perdu'].map(s=>`<option ${s==r.status?'selected':''}>${s}</option>`).join('')}</select><a class="b" style="text-align:center;text-decoration:none" target="_blank" href="https://wa.me/${r.phone.replace(/\D/g,'').replace(/^(\d{10})$/,'225$1')}">Répondre WhatsApp</a></div></div>`).join('')||'<div class="box">Aucune demande.</div>'}
+function vq(){const u=(F.SITE_URL||location.origin)+'/';$('#mn').innerHTML='<div class="box"><h3>QR codes de suivi</h3><p>Un QR par support pour savoir lequel vous rapporte le plus de clients.</p>'+['flyer','carte','banderole','tiktok'].map(s=>{const q=qrcode(0,'M');q.addData(u+'?src='+s);q.make();return`<div class="row"><div>${q.createImgTag(5)}</div><div class="i"><b>${s}</b><br>${u}?src=${s}</div></div>`}).join('')+'</div>'}
+init();
+</script></body></html>
