@@ -31,3 +31,10 @@ Après toute modification : glissez à nouveau le dossier dans Netlify, puis rec
 
 ## Plus tard : Mobile Money
 `PAY_ENABLED:true` dans `config.js` puis branchement CinetPay ou PayDunya.
+
+## Proformas (factures proforma)
+1. **Une seule fois** : Supabase > SQL Editor > collez `proformas.sql` > Run. (Ne relancez pas `schema.sql` en entier sans remettre votre e-mail administrateur dans la fonction `is_admin`.)
+2. Application > 👤 Compte > ⚙ Gestion > **Proformas** > « Nouveau proforma ».
+3. Remplissez le client, la livraison et les articles (le catalogue propose les noms et remplit le prix), puis les montants (jours, remise, transport, caution, avance). L'aperçu se met à jour en direct.
+4. **Enregistrer**, puis **Imprimer / PDF** (choisir « Enregistrer au format PDF » dans la fenêtre d'impression) ou **WhatsApp** pour envoyer le résumé au client.
+5. Depuis **Demandes**, le bouton « 🧾 Créer un proforma » reprend automatiquement le client et les articles d'une demande reçue.

@@ -13,7 +13,7 @@ alter table items add column if not exists description_en text;
 alter table requests add column if not exists user_id uuid default auth.uid() references auth.users on delete set null;
 
 create or replace function is_admin() returns boolean language sql stable as
-$$ select lower(coalesce(auth.jwt()->>'email',''))=lower('contactfirstmiracleevent@gmail.com') $$;
+$$ select lower(coalesce(auth.jwt()->>'email',''))=lower('REMPLACEZ@VOTRE-EMAIL.COM') $$;
 
 create or replace function handle_new_user() returns trigger language plpgsql security definer set search_path=public as
 $$ begin insert into profiles(id,name,phone) values(new.id,new.raw_user_meta_data->>'name',new.raw_user_meta_data->>'phone') on conflict do nothing; return new; end $$;
@@ -42,3 +42,9 @@ drop policy if exists "media lecture" on storage.objects;drop policy if exists "
 create policy "media lecture" on storage.objects for select using(bucket_id='media');
 create policy "media admin" on storage.objects for all to authenticated using(bucket_id='media' and is_admin()) with check(bucket_id='media' and is_admin());
 create policy "media inspiration" on storage.objects for insert to anon,authenticated with check(bucket_id='media' and name like 'inspiration/%');
+
+-- Proformas (factures proforma, réservées à l'administrateur)
+create table if not exists proformas(id uuid primary key default gen_random_uuid(),created_at timestamptz default now(),number text unique not null,client_name text,total numeric default 0,status text default 'brouillon',data jsonb not null);
+alter table proformas enable row level security;
+drop policy if exists "proforma admin" on proformas;
+create policy "proforma admin" on proformas for all to authenticated using(is_admin()) with check(is_admin());
