@@ -38,3 +38,9 @@ Après toute modification : glissez à nouveau le dossier dans Netlify, puis rec
 3. Remplissez le client, la livraison et les articles (le catalogue propose les noms et remplit le prix), puis les montants (jours, remise, transport, caution, avance). L'aperçu se met à jour en direct.
 4. **Enregistrer**, puis **Imprimer / PDF** (choisir « Enregistrer au format PDF » dans la fenêtre d'impression) ou **WhatsApp** pour envoyer le résumé au client.
 5. Depuis **Demandes**, le bouton « 🧾 Créer un proforma » reprend automatiquement le client et les articles d'une demande reçue.
+
+## Fidélité et avis clients
+1. **Une seule fois** : Supabase > SQL Editor > collez `fidelite_avis.sql` > Run.
+2. **Fidélité** : réglages dans `config.js` (`LOYALTY` : points par FCFA, niveaux, avantages). Les clients voient leur carte dans « 👤 Compte ». Vous créditez les points depuis un proforma (⭐ Créditer les points fidélité) ou depuis Gestion > Clients (± pts).
+3. **Avis** : les clients connectés laissent une note et un commentaire ; l'avis est publié après votre validation dans Gestion > Avis. Vous pouvez aussi y ajouter un avis reçu par WhatsApp.
+4. **Proformas** : sections (ex. « Location de matériel »), désignation libre, détail sous chaque article, ajout depuis le catalogue par cases à cocher, boutons ↑ ↓ pour réordonner.
